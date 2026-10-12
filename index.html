@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chủ Đề 01: Độ Dịch Chuyển & Quãng Đường - Vật Lý 10</title>
+<style>
+  :root {
+    --primary: #1976d2;
+    --primary-dark: #0d47a1;
+    --primary-light: #e3f2fd;
+    --success: #2e7d32;
+    --success-bg: #e8f5e9;
+    --error: #c62828;
+    --error-bg: #ffebee;
+    --bg: #f4f6f9;
+    --card: #ffffff;
+    --text: #212121;
+    --border: #e0e0e0;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+  body { background-color: var(--bg); color: var(--text); padding: 15px; line-height: 1.6; }
+  .container { max-width: 900px; margin: 0 auto; }
+
+  /* Định dạng công thức toán / lý thuần CSS (Offline 100%) */
+  .math { font-family: "Cambria Math", "Times New Roman", Times, serif; font-style: italic; }
+  .math-unit { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-style: normal; margin-left: 2px; }
+  .vec { position: relative; display: inline-block; padding-top: 0.2em; font-style: italic; }
+  .vec::before { content: "→"; position: absolute; top: -0.45em; left: 50%; transform: translateX(-50%); font-size: 0.8em; font-style: normal; }
+  .sqrt { white-space: nowrap; }
+  .sqrt-sign { font-size: 1.15em; font-style: normal; vertical-align: -1px; }
+  .sqrt-line { border-top: 1.2px solid currentColor; padding-top: 1px; display: inline-block; }
+  .frac { display: inline-flex; flex-direction: column; vertical-align: middle; text-align: center; font-size: 0.9em; padding: 0 2px; }
+  .frac-top { border-bottom: 1.2px solid currentColor; padding: 0 2px; }
+  .frac-bot { padding: 0 2px; }
+  sup, sub { font-size: 0.75em; line-height: 0; }
+
+  /* Giao diện Header & Điều khiển */
+  header { background: var(--card); padding: 22px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 16px; text-align: center; }
+  header h1 { font-size: 1.45rem; color: var(--primary-dark); margin-bottom: 6px; }
+  header p { color: #616161; font-size: 0.95rem; }
+
+  .sticky-bar { position: sticky; top: 10px; z-index: 100; background: var(--card); border: 1px solid var(--border); padding: 12px 18px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.08); margin-bottom: 20px; }
+  .timer-box { font-size: 1.15rem; font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 6px; }
+  .actions { display: flex; gap: 10px; }
+
+  .btn { border: none; padding: 10px 18px; border-radius: 6px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: 0.2s; }
+  .btn-start { background: var(--primary); color: #fff; width: 100%; max-width: 250px; padding: 12px 24px; font-size: 1.1rem; }
+  .btn-submit { background: var(--primary); color: #fff; }
+  .btn-submit:hover { background: var(--primary-dark); }
+  .btn-reset { background: #616161; color: #fff; }
+  .btn-reset:hover { background: #424242; }
+
+  /* Bảng kết quả tổng */
+  #result-panel { display: none; background: #fff; padding: 24px; border-radius: 12px; margin-bottom: 24px; border: 2px solid var(--primary); text-align: center; box-shadow: 0 4px 14px rgba(0,0,0,0.07); }
+  .score-display { font-size: 2.3rem; font-weight: 800; color: var(--primary); margin: 8px 0; }
+  .score-details { font-size: 1.05rem; color: #424242; }
+
+  /* Thẻ câu hỏi */
+  .section-title { font-size: 1.25rem; color: var(--primary-dark); margin: 30px 0 14px; border-left: 5px solid var(--primary); padding-left: 10px; }
+  .q-card { background: var(--card); padding: 18px 20px; border-radius: 10px; border: 1px solid var(--border); margin-bottom: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.04); transition: border 0.3s; }
+  .q-badge { display: inline-block; font-size: 0.75rem; background: var(--primary-light); color: var(--primary-dark); padding: 2px 8px; border-radius: 4px; margin-bottom: 8px; font-weight: 600; }
+  .q-title { font-weight: 600; margin-bottom: 12px; font-size: 1rem; }
+
+  /* Dạng ABCD */
+  .mc-options { display: grid; gap: 8px; }
+  .mc-label { display: flex; align-items: center; padding: 10px 14px; border: 1px solid var(--border); border-radius: 6px; cursor: pointer; transition: 0.2s; }
+  .mc-label:hover { background: #f8f9fa; }
+  .mc-label input { margin-right: 12px; transform: scale(1.15); }
+
+  /* Dạng Đúng / Sai */
+  .tf-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+  .tf-table th, .tf-table td { padding: 10px 12px; border: 1px solid var(--border); }
+  .tf-table th { background: #fafafa; font-size: 0.9rem; text-align: left; }
+  .tf-table td.center { text-align: center; width: 75px; }
+  .tf-table input { transform: scale(1.2); }
+
+  /* Dạng Điền ngắn & Tự luận */
+  .input-short { width: 100%; max-width: 250px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 1rem; margin-top: 6px; }
+  .input-short:focus { outline: none; border-color: var(--primary); }
+  .textarea-essay { width: 100%; min-height: 85px; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.95rem; resize: vertical; margin-top: 6px; }
+
+  /* Giải chi tiết & highlight đúng sai */
+  .explanation { display: none; margin-top: 14px; padding: 12px 16px; border-radius: 6px; background: var(--success-bg); border-left: 4px solid var(--success); font-size: 0.95rem; }
+  .explanation-title { font-weight: 700; color: var(--success); margin-bottom: 4px; }
+  .is-correct { border: 2px solid var(--success) !important; background-color: #fafdfa !important; }
+  .is-wrong { border: 2px solid var(--error) !important; background-color: #fffafa !important; }
+
+  /* Trạng thái che bài trước khi bấm Bắt đầu */
+  #quiz-container { display: none; }
+  #welcome-box { background: var(--card); padding: 40px 20px; border-radius: 12px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1>CHỦ ĐỀ 01: ĐỘ DỊCH CHUYỂN VÀ QUÃNG ĐƯỜNG ĐI ĐƯỢC</h1>
+    <p>Chương II: Động Học • Môn Vật Lý 10 • Bộ câu hỏi trắc nghiệm & tự luận tiêu biểu</p>
+  </header>
+
+  <!-- Màn hình chào mừng và nút bắt đầu -->
+  <div id="welcome-box">
+    <h2 style="color: var(--primary-dark); margin-bottom: 12px;">Sẵn sàng làm bài kiểm tra</h2>
+    <p style="margin-bottom: 24px; color: #555;">Bài thi bao gồm 12 câu trắc nghiệm khách quan, 2 câu đúng/sai, 4 câu trả lời ngắn và phần tự luận tham khảo.<br>Hệ thống sẽ bắt đầu tính thời gian ngay khi bạn bấm nút dưới đây.</p>
+    <button class="btn btn-start" onclick="startExam()">Bắt đầu làm bài</button>
+  </div>
+
+  <div id="quiz-container">
+    <div class="sticky-bar">
+      <div class="timer-box" id="timer">⏱️ Thời gian: 00:00</div>
+      <div class="actions">
+        <button class="btn btn-submit" id="btn-submit" onclick="submitExam()">Nộp bài</button>
+        <button class="btn btn-reset" id="btn-reset" onclick="resetExam()" style="display: none;">Làm lại</button>
+      </div>
+    </div>
+
+    <div id="result-panel">
+      <h2>KẾT QUẢ BÀI LÀM</h2>
+      <div class="score-display" id="final-score">0.0 / 10</div>
+      <div class="score-details" id="score-details"></div>
+    </div>
+
+    <form id="quiz-form">
+
+      <!-- PHẦN II: TỰ LUẬN -->
+      <h2 class="section-title">PHẦN II: BÀI TẬP TỰ LUẬN MẪU TIÊU BIỂU</h2>
+      
+      <div class="q-card">
+        <span class="q-badge">Tự luận • Không chấm điểm tự động</span>
+        <div class="q-title">Câu 1 [Thông hiểu]: Một người đi bộ từ nhà A đến siêu thị B cách nhà 3 km về phía Đông, sau đó đi tiếp từ B đến trường học C cách B 4 km về phía Bắc.
+          <br>a) Tính tổng quãng đường người đó đã đi.
+          <br>b) Xác định độ lớn độ dịch chuyển tổng hợp của người đó từ nhà A đến trường học C.
+        </div>
+        <textarea class="textarea-essay" placeholder="Ghi lời giải của bạn vào đây..."></textarea>
+        <div class="explanation" id="exp-essay-1">
+          <div class="explanation-title">Gợi ý & Hướng dẫn giải chi tiết:</div>
+          a) Tổng quãng đường người đó đã đi là: <br>
+          &emsp;<span class="math">s = AB + BC = 3 + 4 = 7<span class="math-unit">km</span></span>.<br>
+          b) Do hướng Đông và hướng Bắc vuông góc nhau tại B, tam giác ABC vuông tại B. Độ lớn độ dịch chuyển tổng hợp từ A đến C là:<br>
+          &emsp;<span class="math">d = AC = <span class="sqrt"><span class="sqrt-sign">√</span><span class="sqrt-line">AB<sup>2</sup> + BC<sup>2</sup></span></span> = <span class="sqrt"><span class="sqrt-sign">√</span><span class="sqrt-line">3<sup>2</sup> + 4<sup>2</sup></span></span> = 5<span class="math-unit">km</span></span>.
+        </div>
+      </div>
+
+      <div class="q-card">
+        <span class="q-badge">Tự luận • Không chấm điểm tự động</span>
+        <div class="q-title">Câu 2 [Vận dụng]: Một học sinh bơi dọc theo chiều dài 100 m của bể bơi hết 60 s, sau đó quay lại bơi tiếp 50 m trong 40 s rồi dừng lại.
+          <br>a) Tính quãng đường bạn học sinh bơi được.
+          <br>b) Tính độ lớn độ dịch chuyển của bạn học sinh.
+        </div>
+        <textarea class="textarea-essay" placeholder="Ghi lời giải của bạn vào đây..."></textarea>
+        <div class="explanation" id="exp-essay-2">
+          <div class="explanation-title">Gợi ý & Hướng dẫn giải chi tiết:</div>
+          a) Tổng quãng đường học sinh bơi được là tổng chiều dài các đoạn đã bơi:<br>
+          &emsp;<span class="math">s = 100 + 50 = 150<span class="math-unit">m</span></span>.<br>
+          b) Do học sinh quay đầu bơi ngược lại chiều ban đầu, khoảng cách từ vị trí xuất phát đến điểm dừng cuối cùng là:<br>
+          &emsp;<span class="math">d = |100 - 50| = 50<span class="math-unit">m</span></span>.
+        </div>
+      </div>
+
+      <!-- PHẦN III: TRẮC NGHIỆM ABCD -->
+      <h2 class="section-title">PHẦN III: CÂU HỎI TRẮC NGHIỆM NHIỀU PHƯƠNG ÁN LỰA CHỌN</h2>
+
+      <div class="q-card" id="card-mc-1">
+        <span class="q-badge">Trắc nghiệm ABCD</span>
+        <div class="q-title">Câu 1 [Nhận biết]: Vật nào sau đây được coi là chất điểm?</div>
+        <div class="mc-options">
+          <label class="mc-label"><input type="radio" name="mc-1" value="A"> A. Trái Đất trong chuyển động tự quay quanh trục của nó.</label>
+          <label class="mc-label"><input type="radio" name="mc-1" value="B"> B. Người đang tập thể dục trên sàn tập.</label>
+          <label class="mc-label"><input type="radio" name="mc-1" value="C"> C. Giọt nước mưa đang rơi từ đám mây xuống mặt đất.</label>
+          <label class="mc-label"><input type="radio" name="mc-1" value="D"> D. Chiếc xe buýt đang vào bến.</label>
+        </div>
+        <div class="explanation" id="exp-mc-1">
+          <div class="explanation-title">Giải thích:</div>
+          <b>Đáp án C.</b> Một vật được coi là chất điểm khi kích thước của nó rất nhỏ so với quãng đường đi được hoặc khoảng cách mà ta xét. Kích thước giọt mưa rất nhỏ so với độ cao từ đám mây xuống mặt đất.
+        </div>
+      </div>
+
+      <div class="q-card" id="card-mc-2">
+        <span class="q-badge">Trắc nghiệm ABCD</span>
+        <div class="q-title">Câu 2 [Nhận biết]: Đại lượng nào sau đây là đại lượng vectơ?</div>
+        <div class="mc-options">
+          <label class="mc-label"><input type="radio" name="mc-2" value="A"> A. Quãng đường.</label>
+          <label class="mc-label"><input type="radio" name="mc-2" value="B"> B. Thời gian.</label>
+          <label class="mc-label"><input type="radio" name="mc-2" value="C"> C. Độ dịch chuyển.</label>
+          <label class="mc-label"><input type="radio" name="mc-2" value="D"> D. Khối lượng.</label>
+        </div>
+        <div class="explanation" id="exp-mc-2">
+          <div class="explanation-title">Giải thích:</div>
+          <b>Đáp án C.</b> Độ dịch chuyển <span class="math"><span class="vec">d</span></span> là đại lượng vectơ đặc trưng cho khoảng cách và hướng di chuyển từ vị trí đầu đến vị trí cuối. Quãng đường, thời gian và khối lượng là các đại lượng vô hướng.
+        </div>
+      </div>
+
+      <div class="q-card" id="card-mc-3">
+        <span class="q-badge">Trắc nghiệm ABCD</span>
+        <div class="q-title">Câu 3 [Nhận biết]: Trường hợp nào sau đây độ lớn của độ dịch chuyển bằng quãng đường đi được?</div>
+        <div class="mc-options">
+          <label class="mc-label"><input type="radio" name="mc-3" value="A"> A. Vật chuyển động cong.</label>
+          <label class="mc-label"><input type="radio" name="mc-3" value="B"> B. Vật chuyển động thẳng và không đổi chiều.</label>
+          <label class="mc-label"><input type="radio" name="mc-3" value="C"> C. Vật chuyển động thẳng và có đổi chiều.</label>
+          <label class="mc-label"><input type="radio" name="mc-3" value="D"> D. Vật chuyển động tròn đều.</label>
+        </div>
+        <div class="explanation" id="exp-mc-3">
+          <div class="explanation-title">Giải thích:</div>
+          <b>Đáp án B.</b> Khi vật chuyển động thẳng và không đổi chiều thì độ lớn của độ dịch chuyển bằng quãng đường đi được (<span class="math">d = s</span>).
+        </div>
+      </div>
+
+      <div class="q-card" id="card-mc-4">
+        <span class="q-badge">Trắc nghiệm ABCD</span>
+        <div class="q-title">Câu 4 [Nhận biết]: Khi vật quay trở lại vị trí ban đầu thì:</div>
+        <div class="mc-options">
+          <label class="mc-label"><input type="radio" name="mc-4" value="A"> A. Quãng đường bằng 0.</label>
+          <label class="mc-label"><input type="radio" name="mc-4" value="B"> B. Độ dịch chuyển bằng 0.</label>
+          <label class="mc-label"><input type="radio" name="mc-4" value="C"> C. Cả quãng đường và độ dịch chuyển đều bằng 0.</label>
+          <label class="mc-label"><input type="radio" name="mc-4" value="D"> D. Độ dịch chuyển lớn hơn quãng đường.</label>
+        </div>
+        <div class="explanation" id="exp-mc-4">
+          <div class="explanation-title">Giải thích:</div>
+          <b>Đáp án B.</b> Độ dịch chuyển nối điểm đầu và điểm cuối. Khi quay về điểm ban đầu, điểm đầu trùng điểm cuối nên <span class="math">d = 0</span>, trong khi quãng đường <span class="math">s > 0</span>.
+        </div>
+      </div>
+
+      <div class="q-card" id="card-mc-5">
+        <span class="q-badge">Trắc nghiệm ABCD</span>
+        <div class="q-title">Câu 5 [Thông hiểu]: Một người đi từ A đến B theo một đường thẳng dài 4 km, sau đó quay lại A. Độ dịch chuyển của người đó là:</div>
+        <div class="mc-options">
+          <label class="mc-label"><input type="radio" name="mc-5" value="A"> A. 8 km.</label>
+          <label class="mc-label"><input type="radio" name="mc-5" value="B"> B. 4 km.</label>
+          <label class="mc-label"><input type="radio" name="mc-5" value="C"> C. 0 km.</label>
+          <label class="mc-label"><input type="radio" name="mc-5" value="D"> D. -4 km.</label>
+        </div>
+        <div class="explanation" id="exp-mc-5">
+          <div class="explanation-title">Giải thích:</div>
+          <b>Đáp án C.</b> Vì vị trí xuất phát và vị trí kết thúc đều là điểm A nên độ dịch chuyển <span class="math">d = 0<span class="math-unit">km</span></span> (quãng đường đi được là <span class="math">4 + 4 = 8<span class="math-unit">km</span></span>).
+        </div>
+      </div>
+
+      <div class="q-card" id="card-mc-6">
+        <span class="q-badge">Trắc nghiệm ABCD</span>
+        <div class="q-title">Câu 6 [Thông hiểu]: Một xe ô tô chạy từ A đến B cách nhau 50 km theo một đường thẳng. Sau đó xe chạy ngược lại 20 km trên cùng đường thẳng đó. Độ dịch chuyển của xe có độ lớn là:</div>
+        <div class="mc-options">
+          <label class="mc-label"><input type="radio" name="mc-6" value="A"> A. 70 km.</label>
+          <label class="mc-label"><input type="radio" name="mc-6" value="B"> B. 30 km.</label>
+          <label class="mc-label"><input type="radio" name="mc-6" value="C"> C. 50 km.</label>
+          <label class="mc-label"><input type="radio" name="mc-6" value="D"> D. 20 km.</label>
+        </div>
+        <div class="explanation" id="exp-mc-6">
+          <div class="explanation-title">Giải thích:</div>
+          <b>Đáp án B.</b> Điểm kết thúc cách điểm bắt đầu A một đoạn là <span class="math">d = 50 - 20 = 30<span class="math-unit">km</span></span>.
+        </div>
+      </div>
+
+      <div class="q-card" id="card-mc-7">
+        <span class="q-badge">Trắc nghiệm ABCD</span>
+        <div class="q-title">Câu 7 [Thông hiểu]: Một chất điểm di chuyển từ điểm M có tọa độ <span class="math">x<sub>1</sub> = 3<span class="math-unit">m</span></span> đến điểm N có tọa độ <span class="math">x<sub>2</sub> = -5<span class="math-unit">m</span></span> trên trục Ox. Độ dịch chuyển của chất điểm là:</div>
+        <div class="mc-options">
+          <label class="mc-label"><input type="radio" name="mc-7" value="A"> A. 8 m.</label>
+          <label class="mc-label"><input type="radio" name="mc-7" value="B"> B. -8 m.</label>
+          <label class="mc-label"><input type="radio" name="mc-7" value="C"> C. 2 m.</label>
+          <label class="mc-label"><input type="radio" name="mc-7" value="D"> D. -2 m.</label>
+        </div>
+        <div class="explanation" id="exp-mc-7">
+          <div class="explanation-title">Giải thích:</div>
+          <b>Đáp án B.</b> Giá trị độ dịch chuyển trên trục tọa độ: <span class="math">d = Δx = x<sub>2</sub> - x<sub>1</sub> = -5 - 3 = -8<span class="math-unit">m</span></span>.
+        </div>
+      </div>
+
+      <div class="q-card" id="card-mc-8">
+        <span class="q-badge">Trắc nghiệm ABCD</span>
+        <div class="q-title">Câu 8 [Thông hiểu]: Một người đi xe máy từ nhà đi về phía Bắc 6 km, sau đó rẽ sang phía Tây đi 8 km. Độ lớn độ dịch chuyển tổng hợp là:</div>
+        <div class="mc-options">
+          <label class="mc-label"><input type="radio" name="mc-8" value="A"> A. 14 km.</label>
+          <label class="mc-label"><input type="radio" name="mc-8" value="B"> B. 2 km.</label>
+          <label class="mc-label"><input type="radio" name="mc-8" value="C"> C. 10 km.</label>
+          <label class="mc-label"><input type="radio" name="mc-8" value="D"> D. 48 km.</label>
+        </div>
+        <div class="explanation" id="exp-mc-8">
+          <div class="explanation-title">Giải thích:</div>
+          <b>Đáp án C.</b> Hướng Bắc và hướng Tây vuông góc nhau, ta có: <br>
+          &emsp;<span class="math">d = <span class="sqrt"><span class="sqrt-sign">√</span><span class="sqrt-line">6<sup>2</sup> + 8<sup>2</sup></span></span> = 10<span class="math-unit">km</span></span>.
+        </div>
+      </div>
+
+      <div class="q-card" id="card-mc-9">
+        <span class="q-badge">Trắc nghiệm ABCD</span>
+        <div class="q-title">Câu 9 [Thông hiểu]: Hai độ dịch chuyển thành phần vuông góc với nhau có độ lớn lần lượt là <span class="math">d<sub>1</sub> = 6<span class="math-unit">m</span></span> và <span class="math">d<sub>2</sub> = 8<span class="math-unit">m</span></span>. Độ lớn độ dịch chuyển tổng hợp là:</div>
+        <div class="mc-options">
+          <label class="mc-label"><input type="radio" name="mc-9" value="A"> A. 14 m.</label>
+          <label class="mc-label"><input type="radio" name="mc-9" value="B"> B. 2 m.</label>
+          <label class="mc-label"><input type="radio" name="mc-9" value="C"> C. 10 m.</label>
+          <label class="mc-label"><input type="radio" name="mc-9" value="D"> D. 48 m.</label>
+        </div>
+        <div class="explanation" id="exp-mc-9">
+          <div class="explanation-title">Giải thích:</div>
+          <b>Đáp án C.</b> Vì hai độ dịch chuyển vuông góc nên: <br>
+          &emsp;<span class="math">d = <span class="sqrt"><span class="sqrt-sign">√</span><span class="sqrt-line">d<sub>1</sub><sup>2</sup> + d<sub>2</sub><sup>2</sup></span></span> = <span class="sqrt"><span class="sqrt-sign">√</span><span class="sqrt-line">6<sup>2</sup> + 8<sup>2</sup></span></span> = 10<span class="math-unit">m</span></span>.
+        </div>
+      </div>
+
+      <div class="q-card" id="card-mc-10">
+        <span class="q-badge">Trắc nghiệm ABCD</span>
+        <div class="q-title">Câu 10 [Vận dụng]: Một vận động viên chạy quanh một bờ hồ hình tròn bán kính <span class="math">R = 100<span class="math-unit">m</span></span>. Sau khi chạy hết 1 vòng bờ hồ, quãng đường <span class="math">s</span> và độ lớn độ dịch chuyển <span class="math">d</span> của vận động viên là:</div>
+        <div class="mc-options">
+          <label class="mc-label"><input type="radio" name="mc-10" value="A"> A. <span class="math">s = 0; d = 200π<span class="math-unit">m</span></span>.</label>
+          <label class="mc-label"><input type="radio" name="mc-10" value="B"> B. <span class="math">s = 200π<span class="math-unit">m</span>; d = 0</span>.</label>
+          <label class="mc-label"><input type="radio" name="mc-10" value="C"> C. <span class="math">s = 100π<span class="math-unit">m</span>; d = 100<span class="math-unit">m</span></span>.</label>
+          <label class="mc-label"><input type="radio" name="mc-10" value="D"> D. <span class="math">s = 200π<span class="math-unit">m</span>; d = 200<span class="math-unit">m</span></span>.</label>
+        </div>
+        <div class="explanation" id="exp-mc-10">
+          <div class="explanation-title">Giải thích:</div>
+          <b>Đáp án B.</b> Quãng đường là chu vi vòng tròn: <span class="math">s = 2πR = 2π × 100 = 200π<span class="math-unit">m</span></span>.<br>
+          Vì quay trở lại vị trí xuất phát nên độ lớn độ dịch chuyển <span class="math">d = 0</span>.
+        </div>
+      </div>
+
+      <div class="q-card" id="card-mc-11">
+        <span class="q-badge">Trắc nghiệm ABCD</span>
+        <div class="q-title">Câu 11 [Vận dụng]: Một con rô-bốt di chuyển từ vị trí A sang B rồi sang C theo quỹ đạo hình chữ nhật ABCD với <span class="math">AB = 6<span class="math-unit">m</span>, BC = 8<span class="math-unit">m</span></span>. Quãng đường và độ lớn độ dịch chuyển của rô-bốt lần lượt là:</div>
+        <div class="mc-options">
+          <label class="mc-label"><input type="radio" name="mc-11" value="A"> A. <span class="math">s = 14<span class="math-unit">m</span>, d = 10<span class="math-unit">m</span></span>.</label>
+          <label class="mc-label"><input type="radio" name="mc-11" value="B"> B. <span class="math">s = 14<span class="math-unit">m</span>, d = 14<span class="math-unit">m</span></span>.</label>
+          <label class="mc-label"><input type="radio" name="mc-11" value="C"> C. <span class="math">s = 10<span class="math-unit">m</span>, d = 10<span class="math-unit">m</span></span>.</label>
+          <label class="mc-label"><input type="radio" name="mc-11" value="D"> D. <span class="math">s = 28<span class="math-unit">m</span>, d = 0</span>.</label>
+        </div>
+        <div class="explanation" id="exp-mc-11">
+          <div class="explanation-title">Giải thích:</div>
+          <b>Đáp án A.</b> <br>
+          - Quãng đường: <span class="math">s = AB + BC = 6 + 8 = 14<span class="math-unit">m</span></span>.<br>
+          - Độ lớn độ dịch chuyển nối điểm đầu A và điểm cuối C (đường chéo): <br>
+          &emsp;<span class="math">d = AC = <span class="sqrt"><span class="sqrt-sign">√</span><span class="sqrt-line">AB<sup>2</sup> + BC<sup>2</sup></span></span> = <span class="sqrt"><span class="sqrt-sign">√</span><span class="sqrt-line">6<sup>2</sup> + 8<sup>2</sup></span></span> = 10<span class="math-unit">m</span></span>.
+        </div>
+      </div>
+
+      <div class="q-card" id="card-mc-12">
+        <span class="q-badge">Trắc nghiệm ABCD</span>
+        <div class="q-title">Câu 12 [Vận dụng]: Một chiếc thuyền đi ngược dòng sông từ A đến B cách nhau 12 km, sau đó xuôi dòng quay về A. Tổng quãng đường và tổng độ dịch chuyển sau cả chuyến đi là:</div>
+        <div class="mc-options">
+          <label class="mc-label"><input type="radio" name="mc-12" value="A"> A. <span class="math">s = 24<span class="math-unit">km</span>, d = 0</span>.</label>
+          <label class="mc-label"><input type="radio" name="mc-12" value="B"> B. <span class="math">s = 0, d = 24<span class="math-unit">km</span></span>.</label>
+          <label class="mc-label"><input type="radio" name="mc-12" value="C"> C. <span class="math">s = 12<span class="math-unit">km</span>, d = 12<span class="math-unit">km</span></span>.</label>
+          <label class="mc-label"><input type="radio" name="mc-12" value="D"> D. <span class="math">s = 24<span class="math-unit">km</span>, d = 12<span class="math-unit">km</span></span>.</label>
+        </div>
+        <div class="explanation" id="exp-mc-12">
+          <div class="explanation-title">Giải thích:</div>
+          <b>Đáp án A.</b> <br>
+          - Tổng quãng đường đi được: <span class="math">s = 12 + 12 = 24<span class="math-unit">km</span></span>.<br>
+          - Thuyền quay trở về điểm xuất phát A nên độ dịch chuyển <span class="math">d = 0</span>.
+        </div>
+      </div>
+
+      <!-- PHẦN IV: ĐÚNG / SAI -->
+      <h2 class="section-title">PHẦN IV: CÂU HỎI TRẮC NGHIỆM ĐÚNG / SAI</h2>
+
+      <div class="q-card" id="card-tf-1">
+        <span class="q-badge">Trắc nghiệm Đúng / Sai</span>
+        <div class="q-title">Câu 1 [Thông hiểu]: Xét một ô tô chuyển động thẳng trên một con đường nằm ngang từ vị trí A đến vị trí B cách A 100 m theo chiều dương, sau đó lùi lại vị trí C nằm giữa A và B cách B 40 m.</div>
+        <table class="tf-table">
+          <thead>
+            <tr><th>Phát biểu</th><th class="center">Đúng</th><th class="center">Sai</th></tr>
+          </thead>
+          <tbody>
+            <tr id="row-tf-1-a">
+              <td>a. Quãng đường ô tô đi được trên cả đoạn đường A → B → C là 140 m.</td>
+              <td class="center"><input type="radio" name="tf-1-a" value="T"></td>
+              <td class="center"><input type="radio" name="tf-1-a" value="F"></td>
+            </tr>
+            <tr id="row-tf-1-b">
+              <td>b. Độ dịch chuyển của ô tô trên cả đoạn đường là 60 m.</td>
+              <td class="center"><input type="radio" name="tf-1-b" value="T"></td>
+              <td class="center"><input type="radio" name="tf-1-b" value="F"></td>
+            </tr>
+            <tr id="row-tf-1-c">
+              <td>c. Độ lớn độ dịch chuyển bằng quãng đường ô tô đi được.</td>
+              <td class="center"><input type="radio" name="tf-1-c" value="T"></td>
+              <td class="center"><input type="radio" name="tf-1-c" value="F"></td>
+            </tr>
+            <tr id="row-tf-1-d">
+              <td>d. Vectơ độ dịch chuyển cùng chiều dương của trục tọa độ.</td>
+              <td class="center"><input type="radio" name="tf-1-d" value="T"></td>
+              <td class="center"><input type="radio" name="tf-1-d" value="F"></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="explanation" id="exp-tf-1">
+          <div class="explanation-title">Giải thích từng phát biểu:</div>
+          - <b>a. Đúng:</b> Quãng đường <span class="math">s = AB + BC = 100 + 40 = 140<span class="math-unit">m</span></span>.<br>
+          - <b>b. Đúng:</b> Vị trí cuối là C, độ dịch chuyển nối từ A đến C: <span class="math">d = AC = AB - BC = 100 - 40 = 60<span class="math-unit">m</span></span>.<br>
+          - <b>c. Sai:</b> Độ lớn độ dịch chuyển là 60 m, trong khi quãng đường là 140 m (<span class="math">d &ne; s</span> do ô tô có đổi chiều).<br>
+          - <b>d. Đúng:</b> Vị trí C nằm ở phía chiều dương so với vị trí gốc ban đầu A nên vectơ <span class="math"><span class="vec">AC</span></span> cùng hướng chiều dương.
+        </div>
+      </div>
+
+      <div class="q-card" id="card-tf-2">
+        <span class="q-badge">Trắc nghiệm Đúng / Sai</span>
+        <div class="q-title">Câu 2 [Vận dụng]: Một người tập thể dục chạy xung quanh một sân vận động hình chữ nhật có chiều dài 120 m và chiều rộng 90 m, xuất phát từ góc A chạy hết một vòng sân trở lại A.</div>
+        <table class="tf-table">
+          <thead>
+            <tr><th>Phát biểu</th><th class="center">Đúng</th><th class="center">Sai</th></tr>
+          </thead>
+          <tbody>
+            <tr id="row-tf-2-a">
+              <td>a. Quãng đường người đó chạy được bằng chu vi hình chữ nhật là 420 m.</td>
+              <td class="center"><input type="radio" name="tf-2-a" value="T"></td>
+              <td class="center"><input type="radio" name="tf-2-a" value="F"></td>
+            </tr>
+            <tr id="row-tf-2-b">
+              <td>b. Độ lớn độ dịch chuyển sau khi chạy nửa vòng từ A sang góc C đối diện là 150 m.</td>
+              <td class="center"><input type="radio" name="tf-2-a" value="T"></td>
+              <td class="center"><input type="radio" name="tf-2-a" value="F"></td>
+            </tr>
+            <tr id="row-tf-2-c">
+              <td>c. Độ dịch chuyển tổng cộng sau khi chạy xong 1 vòng là 420 m.</td>
+              <td class="center"><input type="radio" name="tf-2-c" value="T"></td>
+              <td class="center"><input type="radio" name="tf-2-c" value="F"></td>
+            </tr>
+            <tr id="row-tf-2-d">
+              <td>d. Nếu người đó dừng lại tại góc B (sau khi chạy cạnh chiều dài), độ dịch chuyển bằng quãng đường đi được.</td>
+              <td class="center"><input type="radio" name="tf-2-d" value="T"></td>
+              <td class="center"><input type="radio" name="tf-2-d" value="F"></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="explanation" id="exp-tf-2">
+          <div class="explanation-title">Giải thích từng phát biểu:</div>
+          - <b>a. Đúng:</b> Chu vi hình chữ nhật là <span class="math">2 × (120 + 90) = 420<span class="math-unit">m</span></span>.<br>
+          - <b>b. Đúng:</b> Khoảng cách từ A đến góc đối diện C là độ dài đường chéo hình chữ nhật: <br>
+          &emsp;<span class="math">AC = <span class="sqrt"><span class="sqrt-sign">√</span><span class="sqrt-line">120<sup>2</sup> + 90<sup>2</sup></span></span> = 150<span class="math-unit">m</span></span>.<br>
+          - <b>c. Sai:</b> Sau 1 vòng người đó trở về góc A nên độ dịch chuyển bằng 0 (quãng đường mới bằng 420 m).<br>
+          - <b>d. Đúng:</b> Trên đoạn AB người đó chuyển động thẳng và không đổi chiều nên <span class="math">d = s = 120<span class="math-unit">m</span></span>.
+        </div>
+      </div>
+
+      <!-- PHẦN V: TRẢ LỜI NGẮN -->
+      <h2 class="section-title">PHẦN V: CÂU HỎI TRẮC NGHIỆM TRẢ LỜI NGẮN</h2>
+
+      <div class="q-card" id="card-sa-1">
+        <span class="q-badge">Trả lời ngắn</span>
+        <div class="q-title">Câu 1 [Thông hiểu]: Một xe máy di chuyển từ vị trí <span class="math">x<sub>1</sub> = -15<span class="math-unit">m</span></span> đến vị trí <span class="math">x<sub>2</sub> = 35<span class="math-unit">m</span></span> trên một trục tọa độ Ox. Độ dịch chuyển của xe máy có giá trị bằng bao nhiêu mét?</div>
+        <input type="text" class="input-short" id="sa-1" placeholder="Nhập số..." autocomplete="off">
+        <div class="explanation" id="exp-sa-1">
+          <div class="explanation-title">Đáp án & Lời giải:</div>
+          Đáp án đúng: <b>50</b><br>
+          Độ dịch chuyển: <span class="math">d = Δx = x<sub>2</sub> - x<sub>1</sub> = 35 - (-15) = 50<span class="math-unit">m</span></span>.
+        </div>
+      </div>
+
+      <div class="q-card" id="card-sa-2">
+        <span class="q-badge">Trả lời ngắn</span>
+        <div class="q-title">Câu 2 [Thông hiểu]: Một người đi xe đạp đi về phía Nam 4 km, sau đó rẽ sang hướng Đông đi 3 km. Độ lớn độ dịch chuyển tổng hợp của người này bằng bao nhiêu kilomet?</div>
+        <input type="text" class="input-short" id="sa-2" placeholder="Nhập số..." autocomplete="off">
+        <div class="explanation" id="exp-sa-2">
+          <div class="explanation-title">Đáp án & Lời giải:</div>
+          Đáp án đúng: <b>5</b><br>
+          Hướng Nam và hướng Đông vuông góc nhau: <br>
+          &emsp;<span class="math">d = <span class="sqrt"><span class="sqrt-sign">√</span><span class="sqrt-line">4<sup>2</sup> + 3<sup>2</sup></span></span> = 5<span class="math-unit">km</span></span>.
+        </div>
+      </div>
+
+      <div class="q-card" id="card-sa-3">
+        <span class="q-badge">Trả lời ngắn</span>
+        <div class="q-title">Câu 3 [Vận dụng]: Một vật chuyển động trên một đường tròn bán kính <span class="math">R = 5<span class="math-unit">m</span></span>. Tính độ lớn độ dịch chuyển của vật (theo đơn vị mét) khi vật đi được nửa vòng tròn.</div>
+        <input type="text" class="input-short" id="sa-3" placeholder="Nhập số..." autocomplete="off">
+        <div class="explanation" id="exp-sa-3">
+          <div class="explanation-title">Đáp án & Lời giải:</div>
+          Đáp án đúng: <b>10</b><br>
+          Khi đi được nửa vòng tròn, vị trí cuối nằm đối xứng với vị trí đầu qua tâm đường tròn. Khoảng cách giữa hai vị trí này chính là đường kính của đường tròn: <br>
+          &emsp;<span class="math">d = 2R = 2 × 5 = 10<span class="math-unit">m</span></span>.
+        </div>
+      </div>
+
+      <div class="q-card" id="card-sa-4">
+        <span class="q-badge">Trả lời ngắn</span>
+        <div class="q-title">Câu 4 [Vận dụng]: Một rô-bốt đi từ A đến B dài 8 m theo hướng Bắc, sau đó đi từ B đến C dài 6 m theo hướng Đông, và cuối cùng đi từ C đến D dài 8 m theo hướng Nam. Độ lớn độ dịch chuyển của rô-bốt từ A đến D bằng bao nhiêu mét?</div>
+        <input type="text" class="input-short" id="sa-4" placeholder="Nhập số..." autocomplete="off">
+        <div class="explanation" id="exp-sa-4">
+          <div class="explanation-title">Đáp án & Lời giải:</div>
+          Đáp án đúng: <b>6</b><br>
+          Hai chuyển động theo hướng Bắc (8 m) và hướng Nam (8 m) ngược chiều nhau nên triệt tiêu độ dời theo phương Bắc - Nam. Do đó điểm kết thúc D chỉ cách điểm xuất phát A đúng 6 m về phía Đông: <br>
+          &emsp;<span class="math">d = AD = BC = 6<span class="math-unit">m</span></span>.
+        </div>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+<script>
+  let seconds = 0;
+  let timerInterval = null;
+  let submitted = false;
+
+  // Bắt đầu làm bài
+  function startExam() {
+    document.getElementById('welcome-box').style.display = 'none';
+    document.getElementById('quiz-container').style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    timerInterval = setInterval(() => {
+      seconds++;
+      const m = String(Math.floor(seconds / 60)).padStart(2, '0');
+      const s = String(seconds % 60).padStart(2, '0');
+      document.getElementById('timer').innerText = `⏱️ Thời gian: ${m}:${s}`;
+    }, 1000);
+  }
+
+  // Khóa tương tác sau khi nộp
+  function disableForm() {
+    const inputs = document.querySelectorAll('input, textarea');
+    inputs.forEach(el => el.disabled = true);
+  }
+
+  // Chấm điểm tự động
+  function submitExam() {
+    if (submitted) return;
+    if (!confirm("Bạn có chắc chắn muốn nộp bài? Sau khi nộp, hệ thống sẽ hiển thị kết quả và giải chi tiết.")) return;
+
+    submitted = true;
+    clearInterval(timerInterval);
+    disableForm();
+
+    let earnedPoints = 0; // Thang 10
+    const totalScore = 10;
+    let correctCount = 0;
+    const totalCountable = 18; // 12 MC + 2 TF + 4 SA
+
+    // 1. Chấm Phần III: ABCD (12 câu, mỗi câu 0.35 điểm = 4.2 điểm)
+    const mcKeys = {
+      1: 'C', 2: 'C', 3: 'B', 4: 'B', 5: 'C', 6: 'B',
+      7: 'B', 8: 'C', 9: 'C', 10: 'B', 11: 'A', 12: 'A'
+    };
+
+    for (let i = 1; i <= 12; i++) {
+      const selected = document.querySelector(`input[name="mc-${i}"]:checked`);
+      const card = document.getElementById(`card-mc-${i}`);
+      if (selected && selected.value === mcKeys[i]) {
+        earnedPoints += 0.35;
+        correctCount++;
+        card.classList.add('is-correct');
+      } else {
+        card.classList.add('is-wrong');
+      }
+      document.getElementById(`exp-mc-${i}`).style.display = 'block';
+    }
+
+    // 2. Chấm Phần IV: Đúng / Sai (2 câu, mỗi câu tối đa 1.4 điểm, chia theo 4 ý)
+    const tfKeys = {
+      1: { a: 'T', b: 'T', c: 'F', d: 'T' },
+      2: { a: 'T', b: 'T', c: 'F', d: 'T' }
+    };
+
+    for (let c = 1; c <= 2; c++) {
+      let subCorrect = 0;
+      ['a', 'b', 'c', 'd'].forEach(sub => {
+        const checked = document.querySelector(`input[name="tf-${c}-${sub}"]:checked`);
+        const row = document.getElementById(`row-tf-${c}-${sub}`);
+        if (checked && checked.value === tfKeys[c][sub]) {
+          subCorrect++;
+          row.style.background = '#e8f5e9';
+        } else {
+          row.style.background = '#ffebee';
+        }
+      });
+
+      earnedPoints += subCorrect * 0.35; // 4 ý x 0.35 = 1.4 điểm mỗi câu
+      const card = document.getElementById(`card-tf-${c}`);
+      if (subCorrect === 4) {
+        correctCount++;
+        card.classList.add('is-correct');
+      } else {
+        card.classList.add('is-wrong');
+      }
+      document.getElementById(`exp-tf-${c}`).style.display = 'block';
+    }
+
+    // 3. Chấm Phần V: Trả lời ngắn (4 câu, mỗi câu 0.75 điểm = 3.0 điểm)
+    const saKeys = { 1: 50, 2: 5, 3: 10, 4: 6 };
+    for (let i = 1; i <= 4; i++) {
+      const input = document.getElementById(`sa-${i}`);
+      const val = parseFloat(input.value.trim().replace(',', '.'));
+      const card = document.getElementById(`card-sa-${i}`);
+      if (!isNaN(val) && val === saKeys[i]) {
+        earnedPoints += 0.75;
+        correctCount++;
+        card.classList.add('is-correct');
+      } else {
+        card.classList.add('is-wrong');
+      }
+      document.getElementById(`exp-sa-${i}`).style.display = 'block';
+    }
+
+    // Hiển thị giải tự luận mẫu
+    document.getElementById('exp-essay-1').style.display = 'block';
+    document.getElementById('exp-essay-2').style.display = 'block';
+
+    // Đảm bảo không làm tròn lố 10
+    const finalScore = Math.min(10, earnedPoints).toFixed(2);
+    document.getElementById('final-score').innerText = `${finalScore} / ${totalScore} điểm`;
+    document.getElementById('score-details').innerHTML = `Số câu đạt điểm tuyệt đối: <b>${correctCount}/${totalCountable}</b> câu<br>Thời gian làm bài: <b>${document.getElementById('timer').innerText.replace('⏱️ Thời gian: ', '')}</b>`;
+    document.getElementById('result-panel').style.display = 'block';
+
+    document.getElementById('btn-submit').style.display = 'none';
+    document.getElementById('btn-reset').style.display = 'inline-block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // Làm lại
+  function resetExam() {
+    location.reload();
+  }
+</script>
+</body>
+</html>
